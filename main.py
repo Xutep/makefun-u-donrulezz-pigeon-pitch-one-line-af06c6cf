@@ -17,12 +17,20 @@ PITCH = (
 OUTPUT_PATH = "/output/entry.txt"
 
 
-def main() -> None:
-    text = PITCH.strip()
+def validate(text: str) -> str:
+    """Return the pitch unchanged, rejecting anything the rules forbid."""
+    text = text.strip()
     if not 1 <= len(text) <= 200:
         raise SystemExit(f"pitch must be 1-200 characters, got {len(text)}")
     if "\n" in text or "\r" in text:
         raise SystemExit("pitch must be a single line")
+    if any(ord(ch) < 0x20 for ch in text):
+        raise SystemExit("pitch must not contain control characters")
+    return text
+
+
+def main() -> None:
+    text = validate(PITCH)
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8", newline="\n") as f:
         f.write(text)
